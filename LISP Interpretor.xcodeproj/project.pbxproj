@@ -1,0 +1,221 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		35F2382916D82DC60028F7D4 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35F2382816D82DC60028F7D4 /* main.cpp */; };
+		35F2382B16D82DC60028F7D4 /* LISP_Interpretor.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 35F2382A16D82DC60028F7D4 /* LISP_Interpretor.1 */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		35F2382316D82DC60028F7D4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				35F2382B16D82DC60028F7D4 /* LISP_Interpretor.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		35F2382516D82DC60028F7D4 /* LISP Interpretor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "LISP Interpretor"; sourceTree = BUILT_PRODUCTS_DIR; };
+		35F2382816D82DC60028F7D4 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		35F2382A16D82DC60028F7D4 /* LISP_Interpretor.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = LISP_Interpretor.1; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		35F2382216D82DC60028F7D4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		35F2381C16D82DC60028F7D4 = {
+			isa = PBXGroup;
+			children = (
+				35F2382716D82DC60028F7D4 /* LISP Interpretor */,
+				35F2382616D82DC60028F7D4 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		35F2382616D82DC60028F7D4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				35F2382516D82DC60028F7D4 /* LISP Interpretor */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		35F2382716D82DC60028F7D4 /* LISP Interpretor */ = {
+			isa = PBXGroup;
+			children = (
+				35F2382816D82DC60028F7D4 /* main.cpp */,
+				35F2382A16D82DC60028F7D4 /* LISP_Interpretor.1 */,
+			);
+			path = "LISP Interpretor";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		35F2382416D82DC60028F7D4 /* LISP Interpretor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 35F2382E16D82DC60028F7D4 /* Build configuration list for PBXNativeTarget "LISP Interpretor" */;
+			buildPhases = (
+				35F2382116D82DC60028F7D4 /* Sources */,
+				35F2382216D82DC60028F7D4 /* Frameworks */,
+				35F2382316D82DC60028F7D4 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "LISP Interpretor";
+			productName = "LISP Interpretor";
+			productReference = 35F2382516D82DC60028F7D4 /* LISP Interpretor */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		35F2381D16D82DC60028F7D4 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0460;
+				ORGANIZATIONNAME = "Rajaditya Mukherjee";
+			};
+			buildConfigurationList = 35F2382016D82DC60028F7D4 /* Build configuration list for PBXProject "LISP Interpretor" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 35F2381C16D82DC60028F7D4;
+			productRefGroup = 35F2382616D82DC60028F7D4 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				35F2382416D82DC60028F7D4 /* LISP Interpretor */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		35F2382116D82DC60028F7D4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				35F2382916D82DC60028F7D4 /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		35F2382C16D82DC60028F7D4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		35F2382D16D82DC60028F7D4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		35F2382F16D82DC60028F7D4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		35F2383016D82DC60028F7D4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		35F2382016D82DC60028F7D4 /* Build configuration list for PBXProject "LISP Interpretor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				35F2382C16D82DC60028F7D4 /* Debug */,
+				35F2382D16D82DC60028F7D4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		35F2382E16D82DC60028F7D4 /* Build configuration list for PBXNativeTarget "LISP Interpretor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				35F2382F16D82DC60028F7D4 /* Debug */,
+				35F2383016D82DC60028F7D4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 35F2381D16D82DC60028F7D4 /* Project object */;
+}
