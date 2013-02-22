@@ -7,12 +7,20 @@
 //
 
 #include <iostream>
+#include <cstring>
 
 int main(int argc, const char * argv[])
 {
 
-    // insert code here...
-    std::cout << "Hello, World!\n";
+    char str[] ="- This, a sample string.";
+    char * pch;
+    std::cout << "Splitting string" << str << " into tokens:\n";
+    pch = strtok (str," ,.-");
+    while (pch != NULL)
+    {
+        std::cout << pch << "\n" ;
+        pch = strtok (NULL, " ,.-");
+    }
     return 0;
 }
 
