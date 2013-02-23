@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		35F2382916D82DC60028F7D4 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35F2382816D82DC60028F7D4 /* main.cpp */; };
 		35F2382B16D82DC60028F7D4 /* LISP_Interpretor.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 35F2382A16D82DC60028F7D4 /* LISP_Interpretor.1 */; };
+		35F2383316D8324F0028F7D4 /* sexpression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35F2383116D8324F0028F7D4 /* sexpression.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,6 +29,8 @@
 		35F2382516D82DC60028F7D4 /* LISP Interpretor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "LISP Interpretor"; sourceTree = BUILT_PRODUCTS_DIR; };
 		35F2382816D82DC60028F7D4 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		35F2382A16D82DC60028F7D4 /* LISP_Interpretor.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = LISP_Interpretor.1; sourceTree = "<group>"; };
+		35F2383116D8324F0028F7D4 /* sexpression.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sexpression.cpp; path = src/sexpression.cpp; sourceTree = "<group>"; };
+		35F2383216D8324F0028F7D4 /* sexpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sexpression.h; path = src/sexpression.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +65,8 @@
 			children = (
 				35F2382816D82DC60028F7D4 /* main.cpp */,
 				35F2382A16D82DC60028F7D4 /* LISP_Interpretor.1 */,
+				35F2383116D8324F0028F7D4 /* sexpression.cpp */,
+				35F2383216D8324F0028F7D4 /* sexpression.h */,
 			);
 			path = "LISP Interpretor";
 			sourceTree = "<group>";
@@ -118,6 +123,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				35F2382916D82DC60028F7D4 /* main.cpp in Sources */,
+				35F2383316D8324F0028F7D4 /* sexpression.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
