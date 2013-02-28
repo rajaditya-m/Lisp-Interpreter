@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <cstring>
+using namespace std;
 
 class SExp
 {
@@ -19,21 +20,21 @@ public:
     SExp* getCAR()          {return car_;           }
     SExp* getCDR()          {return cdr_;           }
     int getIntegerID()      {return intVal_;        }
-    char* getStringID()     {return stringVal_;     }
+    string getStringID()    {return stringVal_;     }
     bool isAtom()           {return isAtom_;        }
     bool isString()         {return isString_;      }
     bool isNull()           {return isNull_;        }
     //Functions that will be defined in headers
     SExp();
     SExp(int val);
-    SExp(char* str);
+    SExp(string str);
     SExp(SExp* cr,SExp* cd);
     
 private:
     SExp* car_;
     SExp* cdr_;
     int intVal_;
-    char* stringVal_;
+    string stringVal_;
     bool isAtom_;
     bool isString_;
     bool isNull_;

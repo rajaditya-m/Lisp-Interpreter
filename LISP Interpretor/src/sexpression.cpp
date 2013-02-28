@@ -11,7 +11,6 @@
 SExp::SExp()
 {
     car_= cdr_= NULL;
-    stringVal_ = NULL;
     isAtom_ = false;
     isString_ = false;
     isNull_ = true;
@@ -20,14 +19,13 @@ SExp::SExp()
 SExp::SExp(int val)
 {
     car_= cdr_= NULL;
-    stringVal_ = NULL;
     intVal_ = val;
     isAtom_ = true;
     isString_ = false;
     isNull_ = false;
 }
 
-SExp::SExp(char* str)
+SExp::SExp(string str)
 {
     car_= cdr_= NULL;
     stringVal_ = str;
@@ -40,7 +38,6 @@ SExp::SExp(SExp* cr,SExp* cd)
 {
     car_= cr;
     cdr_= cd;
-    stringVal_ = NULL;
     isAtom_ = false;
     isString_ = false;
     isNull_ = false;
