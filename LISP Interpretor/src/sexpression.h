@@ -26,6 +26,7 @@ public:
     bool isAtom()           {return isAtom_;                                        }
     bool isString()         {return isString_;                                      }
     bool isNull()           {return !(std::strcmp(stringVal_.c_str(),"NIL"));       }
+    bool isCAR()            {return isCAR_;                                         }
     //Mutator Methods
     void setStringID(std::string stringVal__) { stringVal_ = stringVal__;       }
     void setIntegerID(int intVal__)           { intVal_ = intVal__;             }
@@ -34,6 +35,7 @@ public:
     void setCAR(SExp* car__)                  { car_ = car__;                   }
     void setCDR(SExp* cdr__)                  { cdr_ = cdr__;                   }
     void setParent(SExp* parent__)            { parent_ = parent__;             }
+    void setIsCAR(bool isCar__)               { isCAR_ =isCar__;                }
     //Functions that will be defined in headers
     SExp();
     SExp(int val);
@@ -49,6 +51,7 @@ private:
     string stringVal_;
     bool isAtom_;
     bool isString_;
+    bool isCAR_;
 };
 
 #endif /* defined(__LISP_Interpretor__sexpression__) */

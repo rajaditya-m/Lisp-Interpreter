@@ -17,6 +17,8 @@
 
 bool isNumber(const std::string& s);
 int convertToNumber(const std::string& s);
+bool getSExpressionTree(std::string text,SExp** S,bool isVerbose);
+
 
 enum tokenType {TR_LP,TR_RP,TR_DOT,TR_ATOM,TERM_SYM};
 
@@ -28,6 +30,26 @@ typedef struct {
 int main(int argc, const char* argv[])
 {
     //@TODO::Get input from the console
+    std::cout << "LISP Interpretor Project 6341 \n(C) Rajaditya Mukherjee \nPlease type in the S-Expression and press <enter>\n";
+    std::cout << "Enter quit to quit";
+    //std::cout << ">";
+    std::string text;
+    bool terminate = false;
+    do {
+        std::cout << "\n>";
+        std::getline(std::cin,text);
+        if(!(std::strcmp(text.c_str(),"quit")))
+           terminate = true;
+        if(!terminate)
+        {
+            SExp* finalSExp = new SExp();
+            bool parsingSuccess = getSExpressionTree(text,&finalSExp,true);
+            if(parsingSuccess)
+                finalSExp->toString();
+            else
+                std::cout << "[ERROR] Parsing Failed.";
+        }
+    } while (!terminate);
     //std::string text = "(DEFUN NOTSOSILLY (A B) (COND ((EQ A 0) (PLUS B 1)) ((EQ B 0) (NOTSOSILLY (MINUS2 A 1) 1)) (T (NOTSOSILLY (MINUS2 A 1) (NOTSOSILLY A (MINUS2 B 1)))) ))";
     //std::string text = " (DEFUN MINUS2 (A B) (MINUS A B))";
     //std::string text = "(DEFUN SILLY (A B) (PLUS A B))";
@@ -36,7 +58,14 @@ int main(int argc, const char* argv[])
     //std::string text = "(CAR (QUOTE (A . B)))";
     //std::string text = "(CONS 4 (QUOTE (A . B)))";
     //std::string text = " (CONS 4 (A . B))";
-    std::string text = " (SILLY (CAR (QUOTE (5 . 6))) (CDR (QUOTE (5 . 6))) )";
+    //std::string text = " (SILLY (CAR (QUOTE (5 . 6))) (CDR (QUOTE (5 . 6))) )";
+    std::cout << "[INFO]LISP Interpretor exited successfully.";
+    return 0;
+    
+}
+
+bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
+{
     
     //Tokenize the strings
     boost::char_separator<char> sep(" ","().",boost::drop_empty_tokens);
@@ -73,14 +102,8 @@ int main(int argc, const char* argv[])
     terminator->type = TERM_SYM;
     tokenList.push_back(*terminator);
     
-    std::cout << "[INFO] Tokenization sucessfully completed\n";
-
-    //Debug routine for Tokenizer
-    //@TODO : Remove later
-    /*BOOST_FOREACH(tokenEntry it, tokenList)
-    {
-        std::cout << it.lexval << " Type :" << it.type << "\n";
-    }*/
+    if(isVerbose)
+        std::cout << "[INFO] Tokenization sucessfully completed\n";
     
     //Map for atomic expressions
     std::map<std::string,SExp*> atomicExpMap;
@@ -92,7 +115,10 @@ int main(int argc, const char* argv[])
     //Map for CAR
     SExp* _car = new SExp("CAR");
     atomicExpMap.insert(std::make_pair("CAR", _car));
-    //@TODO : Insert more basic maps required
+    //Map for CDR
+    SExp* _cdr = new SExp("CDR");
+    atomicExpMap.insert(std::make_pair("CDR", _cdr));
+    //@TODO : Insert more basic maps (if)
     //@TODO : Possibly shift them to some function
     
     //Parser for S Expression
@@ -103,7 +129,6 @@ int main(int argc, const char* argv[])
     boost::lockfree::stack<SExp*> *addEStack = new boost::lockfree::stack<SExp*>(100);
     parsingStack->push('$');
     parsingStack->push('S');
-    SExp *S = new SExp();
     SExp *E;
     SExp *X;
     SExp *Y;
@@ -124,273 +149,344 @@ int main(int argc, const char* argv[])
         {
             parsingStack->pop(symStackTop);
             parsingStack->push(symStackTop);
-            // std::cout << "Current stack top : " << symStackTop << "\n";
-            // std::cout << "Current symbol being processed : " << curTok.lexval << "\n";
             switch (symStackTop)
             {
                     
                 case 'S':
                     switch (curTok.type)
-                    {
-                        case TR_LP :
-                            std::cout << "Apply rule S->E \n";
-                            //Parsing Stuff
-                            char t1;
-                            parsingStack->pop(t1);
-                            parsingStack->push('E');
-                            //Pointer Manupulation for tree
-                            addEStack->push(S);
-                            //E = S;
-                            break;
-                        case TR_ATOM :
-                            std::cout << "Apply rule S->E \n";
-                            //Parsing Stuff
-                            char t2;
-                            parsingStack->pop(t2);
-                            parsingStack->push('E');
-                            //Pointer Manupulation for tree
-                            addEStack->push(S);
-                            //E = S;
-                            break;
-                        default :
-                            std::cout << "Error in Parser found";
-                            errorF = true;
-                            break;
-                    }
+                {
+                    case TR_LP :
+                        if(isVerbose)
+                            std::cout << "[INFO] Apply rule S->E \n";
+                        //Parsing Stuff
+                        char t1;
+                        parsingStack->pop(t1);
+                        parsingStack->push('E');
+                        //Pointer Manupulation for tree
+                        addEStack->push(*S);
+                        //E = S;
+                        break;
+                    case TR_ATOM :
+                        if(isVerbose)
+                            std::cout << "[INFO] Apply rule S->E \n";
+                        //Parsing Stuff
+                        char t2;
+                        parsingStack->pop(t2);
+                        parsingStack->push('E');
+                        //Pointer Manupulation for tree
+                        addEStack->push(*S);
+                        //E = S;
+                        break;
+                    default :
+                        if(isVerbose)
+                            std::cout << "[ERROR] Error in Parser found. Error Parsing Token - " << curTok.lexval;
+                        errorF = true;
+                        break;
+                }
                     break;
                 case 'E':
                     switch (curTok.type)
-                    {
-                        case TR_LP :
-                            //Parsing Stuff
-                            std::cout << "Apply rule E->( X \n";
-                            char t1;
-                            parsingStack->pop(t1);
-                            parsingStack->push('X');
-                            parsingStack->push('(');
-                            //Pointer Manupulation for Tree
-                            addEStack->pop(E);
-                            addXStack->push(E);
-                            //X = E;
-                            break;
-                        case TR_ATOM :
-                            std::cout << "Apply rule E->atom \n";
-                            //Parsing Stuff
-                            char t2;
-                            parsingStack->pop(t2);
-                            parsingStack->push('a');
-                            //Pointer Manupulation for tree
-                            addEStack->pop(E);
-                            if(isNumber(curTok.lexval))
+                {
+                    case TR_LP :
+                        //Parsing Stuff
+                        if(isVerbose)
+                            std::cout << "[INFO] Apply rule E->( X \n";
+                        char t1;
+                        parsingStack->pop(t1);
+                        parsingStack->push('X');
+                        parsingStack->push('(');
+                        //Pointer Manupulation for Tree
+                        addEStack->pop(E);
+                        addXStack->push(E);
+                        //X = E;
+                        break;
+                    case TR_ATOM :
+                        if(isVerbose)
+                            std::cout << "[INFO] Apply rule E->atom \n";
+                        //Parsing Stuff
+                        char t2;
+                        parsingStack->pop(t2);
+                        parsingStack->push('a');
+                        //Pointer Manupulation for tree
+                        addEStack->pop(E);
+                        if(isNumber(curTok.lexval))
+                        {
+                            E->setIntegerID(convertToNumber(curTok.lexval));
+                            E->setIsAtom(true);
+                            E->setIsString(false);
+                        }
+                        else
+                        {
+                            if(!(std::strcmp("NIL",curTok.lexval.c_str())))
                             {
-                                E->setIntegerID(convertToNumber(curTok.lexval));
-                                E->setIsAtom(true);
-                                E->setIsString(false);
+                                SExp* parent = E->getParent();
+                                if(E->isCAR())
+                                    parent->setCAR((atomicExpMap.find("NIL")->second));
+                                else
+                                    parent->setCDR((atomicExpMap.find("NIL")->second));
+                            }
+                            else if (!(std::strcmp("CAR",curTok.lexval.c_str())))
+                            {
+                                SExp* parent = E->getParent();
+                                if(E->isCAR())
+                                    parent->setCAR((atomicExpMap.find("CAR")->second));
+                                else
+                                    parent->setCDR((atomicExpMap.find("CAR")->second));
+                            }
+                            else if (!(std::strcmp("CDR",curTok.lexval.c_str())))
+                            {
+                                SExp* parent = E->getParent();
+                                if(E->isCAR())
+                                    parent->setCAR((atomicExpMap.find("CDR")->second));
+                                else
+                                    parent->setCDR((atomicExpMap.find("CDR")->second));
                             }
                             else
                             {
-                                //@TODO : Do parent manupulation for strings like NIL CAR CDR
-                                E->setStringID(curTok.lexval);
-                                E->setIsAtom(true);
-                                E->setIsString(true);
+                                if(atomicExpMap.find(curTok.lexval)==atomicExpMap.end())
+                                {
+                                    E->setStringID(curTok.lexval);
+                                    E->setIsAtom(true);
+                                    E->setIsString(true);
+                                    if(isVerbose)
+                                        std::cout << "[INFO] Inserted new string pair '"<< curTok.lexval <<"' in table. \n";
+                                    atomicExpMap.insert(std::make_pair(curTok.lexval,E));
+                                }
+                                else
+                                {
+                                    SExp* parent = E->getParent();
+                                    if(E->isCAR())
+                                        parent->setCAR((atomicExpMap.find(curTok.lexval)->second));
+                                    else
+                                        parent->setCDR((atomicExpMap.find(curTok.lexval)->second));
+                                }
+                                
                             }
-                            //@TODO : Remove
-                            std::cout << "Atom processed is" << curTok.lexval << "\n";
-                            break;
-                        default :
-                            std::cout << "Error in Parser found";
-                            errorF = true;
-                            break;
-                    }
+                                
+                        }
+                        if(isVerbose)
+                            std::cout << "[INFO] Atom processed is " << curTok.lexval << "\n";
+                        break;
+                    default :
+                        if(isVerbose)
+                            std::cout << "[ERROR] Error in Parser found. Error Parsing Token - " << curTok.lexval;
+                        errorF = true;
+                        break;
+                }
                     break;
                 case 'X':
                     switch (curTok.type)
-                    {
-                        case TR_LP :
-                            std::cout << "Apply rule X->E Y  \n";
-                            //Parsing Stuff
-                            char t1;
-                            parsingStack->pop(t1);
-                            parsingStack->push('Y');
-                            parsingStack->push('E');
-                            //Pointer Manupulation for Tree
-                            addXStack->pop(X);
-                            E1 = new SExp();
-                            Y1 = new SExp();
-                            X->setCAR(E1);
-                            X->setCDR(Y1);
-                            E1->setParent(X);
-                            Y1->setParent(X);
-                            //E = E1;
-                            //Y = Y1;
-                            addEStack->push(E1);
-                            addYStack->push(Y1);
-                            break;
-                        case TR_RP :
-                            std::cout << "Apply rule X-> )  \n";
-                            //Parsing Stuff
-                            char t2;
-                            parsingStack->pop(t2);
-                            parsingStack->push(')');
-                            //Pointer Manupulation for tree
-                            //@TODO Do repetation manupulation
-                            addXStack->pop(X);
-                            X->setStringID("NIL");
-                            X->setIsAtom(true);
-                            X->setIsString(true);
-                            break;
-                        case TR_ATOM :
-                            std::cout << "Apply rule X-> E Y  \n";
-                            //Parsing Stuff
-                            char t3;
-                            parsingStack->pop(t3);
-                            parsingStack->push('Y');
-                            parsingStack->push('E');
-                            //Pointer Manupulation for Tree
-                            addXStack->pop(X);
-                            E1 = new SExp();
-                            Y1 = new SExp();
-                            X->setCAR(E1);
-                            X->setCDR(Y1);
-                            E1->setParent(X);
-                            Y1->setParent(X);
-                            //E = E1;
-                            //Y = Y1;
-                            addEStack->push(E1);
-                            addYStack->push(Y1);
-                            break;
-                        default : std::cout << "Error in Parser found";
-                            errorF = true;
-                            break;
-                    }
+                {
+                    case TR_LP :
+                        if(isVerbose)
+                            std::cout << "[INFO] Apply rule X->E Y  \n";
+                        //Parsing Stuff
+                        char t1;
+                        parsingStack->pop(t1);
+                        parsingStack->push('Y');
+                        parsingStack->push('E');
+                        //Pointer Manupulation for Tree
+                        addXStack->pop(X);
+                        E1 = new SExp();
+                        Y1 = new SExp();
+                        X->setCAR(E1);
+                        X->setCDR(Y1);
+                        E1->setParent(X);
+                        E1->setIsCAR(true);
+                        Y1->setParent(X);
+                        Y1->setIsCAR(false);
+                        //E = E1;
+                        //Y = Y1;
+                        addEStack->push(E1);
+                        addYStack->push(Y1);
+                        break;
+                    case TR_RP :
+                        if(isVerbose)
+                            std::cout << "[INFO] Apply rule X-> )  \n";
+                        //Parsing Stuff
+                        char t2;
+                        parsingStack->pop(t2);
+                        parsingStack->push(')');
+                        //Pointer Manupulation for tree
+                        addXStack->pop(X);
+                        {
+                            SExp* parent = X->getParent();
+                            if(X->isCAR())
+                                parent->setCAR((atomicExpMap.find("NIL")->second));
+                            else
+                                parent->setCDR((atomicExpMap.find("NIL")->second));
+                        }
+                        break;
+                    case TR_ATOM :
+                        if(isVerbose)
+                            std::cout << "[INFO]Apply rule X-> E Y  \n";
+                        //Parsing Stuff
+                        char t3;
+                        parsingStack->pop(t3);
+                        parsingStack->push('Y');
+                        parsingStack->push('E');
+                        //Pointer Manupulation for Tree
+                        addXStack->pop(X);
+                        E1 = new SExp();
+                        Y1 = new SExp();
+                        X->setCAR(E1);
+                        X->setCDR(Y1);
+                        E1->setParent(X);
+                        E1->setIsCAR(true);
+                        Y1->setParent(X);
+                        Y1->setIsCAR(false);
+                        addEStack->push(E1);
+                        addYStack->push(Y1);
+                        break;
+                    default :
+                        if(isVerbose)
+                            std::cout << "[ERROR] Error in Parser found. Error Parsing Token - " << curTok.lexval;
+                        errorF = true;
+                        break;
+                }
                     break;
                 case 'Y':
                     switch (curTok.type)
-                    {
-                        case TR_LP :
-                            std::cout << "Apply rule Y ->R )  \n";
-                            //Parsing Stuff
-                            char t1;
-                            parsingStack->pop(t1);
-                            parsingStack->push(')');
-                            parsingStack->push('R');
-                            //Pointer Manupulation for Tree
-                            //Check if stack is empty or not
-                            //if(!(addYStack->empty()))
-                            //{
-                            addYStack->pop(Y);
-                            //}
-                            addRStack->push(Y);
-                            //R = Y;
-                            break;
-                        case TR_RP :
-                            std::cout << "Apply rule Y-> R )  \n";
-                            //Parsing Stuff
-                            char t2;
-                            parsingStack->pop(t2);
-                            parsingStack->push(')');
-                            parsingStack->push('R');
-                            addYStack->pop(Y);
-                            addRStack->push(Y);
-                            break;
-                        case TR_DOT :
-                            std::cout << "Apply rule Y-> . E ) \n";
-                            //Parsing Stuff
-                            char t3;
-                            parsingStack->pop(t3);
-                            parsingStack->push(')');
-                            parsingStack->push('E');
-                            parsingStack->push('.');
-                            //Pointer Manupulations for Tree
-                            addYStack->pop(Y);
-                            addEStack->push(Y->getParent()->getCDR());
-                            break;
-                        case TR_ATOM :
-                            std::cout << "Apply rule Y -> R )  \n";
-                            //Parsing Stuff
-                            char t4;
-                            parsingStack->pop(t4);
-                            parsingStack->push(')');
-                            parsingStack->push('R');
-                            //Pointer Manupulation for Tree
-                            addYStack->pop(Y);
-                            addRStack->push(Y);
-                            break;
-                        default :
-                            std::cout << "Error in Parser found";
-                            errorF = true;
-                            break;
-                    }
+                {
+                    case TR_LP :
+                        if(isVerbose)
+                            std::cout << "[INFO] Apply rule Y ->R )  \n";
+                        //Parsing Stuff
+                        char t1;
+                        parsingStack->pop(t1);
+                        parsingStack->push(')');
+                        parsingStack->push('R');
+                        //Pointer Manupulation for Tree
+                        //Check if stack is empty or not
+                        //if(!(addYStack->empty()))
+                        //{
+                        addYStack->pop(Y);
+                        //}
+                        addRStack->push(Y);
+                        //R = Y;
+                        break;
+                    case TR_RP :
+                        if(isVerbose)
+                            std::cout << "[INFO] Apply rule Y-> R )  \n";
+                        //Parsing Stuff
+                        char t2;
+                        parsingStack->pop(t2);
+                        parsingStack->push(')');
+                        parsingStack->push('R');
+                        addYStack->pop(Y);
+                        addRStack->push(Y);
+                        break;
+                    case TR_DOT :
+                        if(isVerbose)
+                            std::cout << "[INFO]Apply rule Y-> . E ) \n";
+                        //Parsing Stuff
+                        char t3;
+                        parsingStack->pop(t3);
+                        parsingStack->push(')');
+                        parsingStack->push('E');
+                        parsingStack->push('.');
+                        //Pointer Manupulations for Tree
+                        addYStack->pop(Y);
+                        addEStack->push(Y->getParent()->getCDR());
+                        break;
+                    case TR_ATOM :
+                        if(isVerbose)
+                            std::cout << "[INFO] Apply rule Y -> R )  \n";
+                        //Parsing Stuff
+                        char t4;
+                        parsingStack->pop(t4);
+                        parsingStack->push(')');
+                        parsingStack->push('R');
+                        //Pointer Manupulation for Tree
+                        addYStack->pop(Y);
+                        addRStack->push(Y);
+                        break;
+                    default :
+                        if(isVerbose)
+                            std::cout << "[ERROR] Error in Parser found. Error Parsing Token - " << curTok.lexval;
+                        errorF = true;
+                        break;
+                }
                     break;
                 case 'R':
                     switch (curTok.type)
-                    {
-                        case TR_LP :
-                            std::cout << "Apply rule R -> E R  \n";
-                            //Parsing Stuff
-                            char t1;
-                            parsingStack->pop(t1);
-                            parsingStack->push('R');
-                            parsingStack->push('E');
-                            //Pointer Manupulation for Tree
-                            E2 = new SExp();
-                            R1 = new SExp();
-                            //Check if stack is empty or not
-                            //if(!(addRStack->empty()))
-                            //{
-                            addRStack->pop(R);
-                            //}
-                            R->setCAR(E2);
-                            R->setCDR(R1);
-                            R1->setParent(R);
-                            E2->setParent(R);
-                            //E = E2;
-                            //R = R1;
-                            addEStack->push(E2);
-                            addRStack->push(R1);
-                            break;
-                        case TR_RP :
-                            std::cout << "Apply rule R -> epsa   \n";
-                            //Parsing Stuff
-                            char t2;
-                            parsingStack->pop(t2);
-                            //Pointer Manupulation for Tree
-                            //@TODO : Repetation Checks for NIL CAR ETC
-                            addRStack->pop(R);
-                            R->setStringID("NIL");
-                            R->setIsAtom(true);
-                            R->setIsString(true);
-                            std::cout << "Imp Debug :: " << S->getCAR()->getIntegerID() << "\n";
-                            break;
-                        case TR_ATOM :
-                            std::cout << "Apply rule R -> E R   \n";
-                            //Parsing Stuff
-                            char t3;
-                            parsingStack->pop(t3);
-                            parsingStack->push('R');
-                            parsingStack->push('E');
-                            //Pointer Manupulation for Tree
-                            E2 = new SExp();
-                            R1 = new SExp();
-                            //Check if stack is empty or not
-                            //if(!(addRStack->empty()))
-                            //{
-                            addRStack->pop(R);
-                            //}
-                            R->setCAR(E2);
-                            R->setCDR(R1);
-                            R1->setParent(R);
-                            E2->setParent(R);
-                            //E = E2;
-                            //R = R1;
-                            addEStack->push(E2);
-                            addRStack->push(R1);
-                            break;
-                        default :
-                            std::cout << "Error in Parser found \n";
-                            errorF = true;
-                            break;
-                    }
+                {
+                    case TR_LP :
+                        if(isVerbose)
+                        std::cout << "[INFO] Apply rule R -> E R  \n";
+                        //Parsing Stuff
+                        char t1;
+                        parsingStack->pop(t1);
+                        parsingStack->push('R');
+                        parsingStack->push('E');
+                        //Pointer Manupulation for Tree
+                        E2 = new SExp();
+                        R1 = new SExp();
+                        //Check if stack is empty or not
+                        //if(!(addRStack->empty()))
+                        //{
+                        addRStack->pop(R);
+                        //}
+                        R->setCAR(E2);
+                        R->setCDR(R1);
+                        R1->setParent(R);
+                        R1->setIsCAR(false);
+                        E2->setParent(R);
+                        E2->setIsCAR(true);
+                        //E = E2;
+                        //R = R1;
+                        addEStack->push(E2);
+                        addRStack->push(R1);
+                        break;
+                    case TR_RP :
+                        if(isVerbose)
+                            std::cout << "[INFO] Apply rule R -> epsa   \n";
+                        //Parsing Stuff
+                        char t2;
+                        parsingStack->pop(t2);
+                        //Pointer Manupulation for Tree
+                        addRStack->pop(R);
+                        {
+                            SExp* parent = R->getParent();
+                            if(R->isCAR())
+                                parent->setCAR((atomicExpMap.find("NIL")->second));
+                            else
+                                parent->setCDR((atomicExpMap.find("NIL")->second));
+                        }
+                        break;
+                    case TR_ATOM :
+                          if(isVerbose)
+                              std::cout << "[INFO]Apply rule R -> E R   \n";
+                        //Parsing Stuff
+                        char t3;
+                        parsingStack->pop(t3);
+                        parsingStack->push('R');
+                        parsingStack->push('E');
+                        //Pointer Manupulation for Tree
+                        E2 = new SExp();
+                        R1 = new SExp();
+                        //Check if stack is empty or not
+                        //if(!(addRStack->empty()))
+                        //{
+                        addRStack->pop(R);
+                        //}
+                        R->setCAR(E2);
+                        R->setCDR(R1);
+                        R1->setParent(R);
+                        R1->setIsCAR(false);
+                        E2->setParent(R);
+                        E2->setIsCAR(true);
+                        //E = E2;
+                        //R = R1;
+                        addEStack->push(E2);
+                        addRStack->push(R1);
+                        break;
+                    default :
+                        if(isVerbose)
+                            std::cout << "[ERROR] Error in Parser found. Error Parsing Token - " << curTok.lexval;
+                        errorF = true;
+                        break;
+                }
                     break;
                 case ')' :
                     if (curTok.type != TR_RP)
@@ -440,25 +536,22 @@ int main(int argc, const char* argv[])
                     break;
                     
                 default:
+                    if(isVerbose)
+                        std::cout << "[ERROR] Error in Parser found. Error Parsing Token - " << curTok.lexval;
                     errorF = true;
                     break;
             }
         }
     }
-    if(errorF)
-        std::cout << "[ERROR] Parsing Failed.\n";
-    else
+    if(finishedP)
     {
-        std::cout << "[INFO] Parsing sucessfully completed\n";
-        //std::cout << S->getCAR()->getIntegerID();
-        S->toString();
+        if(isVerbose)
+            std::cout << "[INFO] Parsing sucessfully completed\n";
     }
-    //char test;
-    //parsingStack->pop(test);
-    //std::cout << test;
-    return 0;
+    return finishedP;
     
 }
+
 
 bool isNumber(const std::string& s)
 {
