@@ -28,11 +28,15 @@ typedef struct {
 int main(int argc, const char* argv[])
 {
     //@TODO::Get input from the console
-    std::string text = "(DEFUN NOTSOSILLY (A B) (COND ((EQ A 0) (PLUS B 1)) ((EQ B 0) (NOTSOSILLY (MINUS2 A 1) 1)) (T (NOTSOSILLY (MINUS2 A 1) (NOTSOSILLY A (MINUS2 B 1)))) ))";
+    //std::string text = "(DEFUN NOTSOSILLY (A B) (COND ((EQ A 0) (PLUS B 1)) ((EQ B 0) (NOTSOSILLY (MINUS2 A 1) 1)) (T (NOTSOSILLY (MINUS2 A 1) (NOTSOSILLY A (MINUS2 B 1)))) ))";
     //std::string text = " (DEFUN MINUS2 (A B) (MINUS A B))";
     //std::string text = "(DEFUN SILLY (A B) (PLUS A B))";
     //std::string text = "(SILLY 5 6)";
     //std::string text = "(PLUS 5 (3))";
+    //std::string text = "(CAR (QUOTE (A . B)))";
+    //std::string text = "(CONS 4 (QUOTE (A . B)))";
+    //std::string text = " (CONS 4 (A . B))";
+    std::string text = " (SILLY (CAR (QUOTE (5 . 6))) (CDR (QUOTE (5 . 6))) )";
     
     //Tokenize the strings
     boost::char_separator<char> sep(" ","().",boost::drop_empty_tokens);
@@ -286,14 +290,8 @@ int main(int argc, const char* argv[])
                             parsingStack->pop(t2);
                             parsingStack->push(')');
                             parsingStack->push('R');
-                            //Pointer Manupulation for Tree
-                            //Check if stack is empty or not
-                            //if(!(addYStack->empty()))
-                            //{
                             addYStack->pop(Y);
-                            //}
                             addRStack->push(Y);
-                            //R = Y;
                             break;
                         case TR_DOT :
                             std::cout << "Apply rule Y-> . E ) \n";
@@ -303,6 +301,9 @@ int main(int argc, const char* argv[])
                             parsingStack->push(')');
                             parsingStack->push('E');
                             parsingStack->push('.');
+                            //Pointer Manupulations for Tree
+                            addYStack->pop(Y);
+                            addEStack->push(Y->getParent()->getCDR());
                             break;
                         case TR_ATOM :
                             std::cout << "Apply rule Y -> R )  \n";
@@ -312,12 +313,8 @@ int main(int argc, const char* argv[])
                             parsingStack->push(')');
                             parsingStack->push('R');
                             //Pointer Manupulation for Tree
-                            //if(!(addYStack->empty()))
-                            //{
                             addYStack->pop(Y);
-                            //}
                             addRStack->push(Y);
-                            //R = Y;
                             break;
                         default :
                             std::cout << "Error in Parser found";
