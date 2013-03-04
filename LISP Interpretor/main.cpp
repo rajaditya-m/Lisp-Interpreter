@@ -10,9 +10,9 @@
 #include <map>
 #include <iomanip>
 #include <sstream>
+#include <stack>
 #include <boost/foreach.hpp>
 #include <boost/tokenizer.hpp>
-#include <boost/lockfree/stack.hpp>
 #include "sexpression.h"
 
 bool isNumber(const std::string& s);
@@ -29,21 +29,32 @@ typedef struct {
 
 int main(int argc, const char* argv[])
 {
-    //@TODO::Get input from the console
     std::cout << "LISP Interpretor Project 6341 \n(C) Rajaditya Mukherjee \nPlease type in the S-Expression and press <enter>\n";
-    std::cout << "Enter quit to quit";
+    std::cout << "Enter 'quit' to Quit.\n";
+    std::cout << "Enter 'verbon'('verboff') to turn ON(OFF) Verbose Mode";
     //std::cout << ">";
     std::string text;
     bool terminate = false;
+    bool isVerbose = false;
     do {
         std::cout << "\n>";
         std::getline(std::cin,text);
         if(!(std::strcmp(text.c_str(),"quit")))
            terminate = true;
-        if(!terminate)
+        else if (!(std::strcmp(text.c_str(),"verboff")))
+        {
+            std::cout << "[INFO] Verbose mode is OFF.";
+            isVerbose = false;
+        }
+        else if (!(std::strcmp(text.c_str(),"verbon")))
+        {
+            std::cout << "[INFO] Verbose mode is ON. Expect lots of information about parsing.";
+            isVerbose = true;
+        }
+        else
         {
             SExp* finalSExp = new SExp();
-            bool parsingSuccess = getSExpressionTree(text,&finalSExp,true);
+            bool parsingSuccess = getSExpressionTree(text,&finalSExp,isVerbose);
             if(parsingSuccess)
                 finalSExp->toString();
             else
@@ -59,6 +70,7 @@ int main(int argc, const char* argv[])
     //std::string text = "(CONS 4 (QUOTE (A . B)))";
     //std::string text = " (CONS 4 (A . B))";
     //std::string text = " (SILLY (CAR (QUOTE (5 . 6))) (CDR (QUOTE (5 . 6))) )";
+    //std::string text = " (defun match (p s)(cond((handle-both-null p s))((handle-normal-recursion p s))((atom (first p)) nil)((handle-? p s))((handle-* p s))((handle-restrict-pred p s))(t nil) ) )"
     std::cout << "[INFO]LISP Interpretor exited successfully.";
     return 0;
     
@@ -122,13 +134,13 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
     //@TODO : Possibly shift them to some function
     
     //Parser for S Expression
-    boost::lockfree::stack<char> *parsingStack = new boost::lockfree::stack<char>(100);
-    boost::lockfree::stack<SExp*> *addRStack = new boost::lockfree::stack<SExp*>(100);
-    boost::lockfree::stack<SExp*> *addYStack = new boost::lockfree::stack<SExp*>(100);
-    boost::lockfree::stack<SExp*> *addXStack = new boost::lockfree::stack<SExp*>(100);
-    boost::lockfree::stack<SExp*> *addEStack = new boost::lockfree::stack<SExp*>(100);
-    parsingStack->push('$');
-    parsingStack->push('S');
+    std::stack<char> parsingStack;
+    std::stack<SExp*> addRStack;
+    std::stack<SExp*> addYStack;
+    std::stack<SExp*> addXStack;
+    std::stack<SExp*> addEStack ;
+    parsingStack.push('$');
+    parsingStack.push('S');
     SExp *E;
     SExp *X;
     SExp *Y;
@@ -147,8 +159,7 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
         bool readyForNxtToken = false;
         while (!(readyForNxtToken || errorF || finishedP))
         {
-            parsingStack->pop(symStackTop);
-            parsingStack->push(symStackTop);
+            symStackTop = parsingStack.top();
             switch (symStackTop)
             {
                     
@@ -160,10 +171,11 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
                             std::cout << "[INFO] Apply rule S->E \n";
                         //Parsing Stuff
                         char t1;
-                        parsingStack->pop(t1);
-                        parsingStack->push('E');
+                        t1 = parsingStack.top();
+                        parsingStack.pop();
+                        parsingStack.push('E');
                         //Pointer Manupulation for tree
-                        addEStack->push(*S);
+                        addEStack.push(*S);
                         //E = S;
                         break;
                     case TR_ATOM :
@@ -171,10 +183,11 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
                             std::cout << "[INFO] Apply rule S->E \n";
                         //Parsing Stuff
                         char t2;
-                        parsingStack->pop(t2);
-                        parsingStack->push('E');
+                        t2 = parsingStack.top();
+                        parsingStack.pop();
+                        parsingStack.push('E');
                         //Pointer Manupulation for tree
-                        addEStack->push(*S);
+                        addEStack.push(*S);
                         //E = S;
                         break;
                     default :
@@ -192,12 +205,14 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
                         if(isVerbose)
                             std::cout << "[INFO] Apply rule E->( X \n";
                         char t1;
-                        parsingStack->pop(t1);
-                        parsingStack->push('X');
-                        parsingStack->push('(');
+                        t1 = parsingStack.top();
+                        parsingStack.pop();
+                        parsingStack.push('X');
+                        parsingStack.push('(');
                         //Pointer Manupulation for Tree
-                        addEStack->pop(E);
-                        addXStack->push(E);
+                        E = addEStack.top();
+                        addEStack.pop();
+                        addXStack.push(E);
                         //X = E;
                         break;
                     case TR_ATOM :
@@ -205,10 +220,12 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
                             std::cout << "[INFO] Apply rule E->atom \n";
                         //Parsing Stuff
                         char t2;
-                        parsingStack->pop(t2);
-                        parsingStack->push('a');
+                        t2 = parsingStack.top();
+                        parsingStack.pop();
+                        parsingStack.push('a');
                         //Pointer Manupulation for tree
-                        addEStack->pop(E);
+                        E = addEStack.top();
+                        addEStack.pop();
                         if(isNumber(curTok.lexval))
                         {
                             E->setIntegerID(convertToNumber(curTok.lexval));
@@ -282,11 +299,13 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
                             std::cout << "[INFO] Apply rule X->E Y  \n";
                         //Parsing Stuff
                         char t1;
-                        parsingStack->pop(t1);
-                        parsingStack->push('Y');
-                        parsingStack->push('E');
+                        t1 = parsingStack.top();
+                        parsingStack.pop();
+                        parsingStack.push('Y');
+                        parsingStack.push('E');
                         //Pointer Manupulation for Tree
-                        addXStack->pop(X);
+                        X=addXStack.top();
+                        addXStack.pop();
                         E1 = new SExp();
                         Y1 = new SExp();
                         X->setCAR(E1);
@@ -297,18 +316,20 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
                         Y1->setIsCAR(false);
                         //E = E1;
                         //Y = Y1;
-                        addEStack->push(E1);
-                        addYStack->push(Y1);
+                        addEStack.push(E1);
+                        addYStack.push(Y1);
                         break;
                     case TR_RP :
                         if(isVerbose)
                             std::cout << "[INFO] Apply rule X-> )  \n";
                         //Parsing Stuff
                         char t2;
-                        parsingStack->pop(t2);
-                        parsingStack->push(')');
+                        t2 = parsingStack.top();
+                        parsingStack.pop();
+                        parsingStack.push(')');
                         //Pointer Manupulation for tree
-                        addXStack->pop(X);
+                        X=addXStack.top();
+                        addXStack.pop();
                         {
                             SExp* parent = X->getParent();
                             if(X->isCAR())
@@ -322,11 +343,13 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
                             std::cout << "[INFO]Apply rule X-> E Y  \n";
                         //Parsing Stuff
                         char t3;
-                        parsingStack->pop(t3);
-                        parsingStack->push('Y');
-                        parsingStack->push('E');
+                        t3 = parsingStack.top();
+                        parsingStack.pop();
+                        parsingStack.push('Y');
+                        parsingStack.push('E');
                         //Pointer Manupulation for Tree
-                        addXStack->pop(X);
+                        X=addXStack.top();
+                        addXStack.pop();
                         E1 = new SExp();
                         Y1 = new SExp();
                         X->setCAR(E1);
@@ -335,8 +358,8 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
                         E1->setIsCAR(true);
                         Y1->setParent(X);
                         Y1->setIsCAR(false);
-                        addEStack->push(E1);
-                        addYStack->push(Y1);
+                        addEStack.push(E1);
+                        addYStack.push(Y1);
                         break;
                     default :
                         if(isVerbose)
@@ -353,53 +376,56 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
                             std::cout << "[INFO] Apply rule Y ->R )  \n";
                         //Parsing Stuff
                         char t1;
-                        parsingStack->pop(t1);
-                        parsingStack->push(')');
-                        parsingStack->push('R');
+                        t1 = parsingStack.top();
+                        parsingStack.pop();
+                        parsingStack.push(')');
+                        parsingStack.push('R');
                         //Pointer Manupulation for Tree
-                        //Check if stack is empty or not
-                        //if(!(addYStack->empty()))
-                        //{
-                        addYStack->pop(Y);
-                        //}
-                        addRStack->push(Y);
-                        //R = Y;
+                        Y = addYStack.top();
+                        addYStack.pop();
+                        addRStack.push(Y);
                         break;
                     case TR_RP :
                         if(isVerbose)
                             std::cout << "[INFO] Apply rule Y-> R )  \n";
                         //Parsing Stuff
                         char t2;
-                        parsingStack->pop(t2);
-                        parsingStack->push(')');
-                        parsingStack->push('R');
-                        addYStack->pop(Y);
-                        addRStack->push(Y);
+                        t2 = parsingStack.top();
+                        parsingStack.pop();
+                        parsingStack.push(')');
+                        parsingStack.push('R');
+                        Y = addYStack.top();
+                        addYStack.pop();
+                        addRStack.push(Y);
                         break;
                     case TR_DOT :
                         if(isVerbose)
                             std::cout << "[INFO]Apply rule Y-> . E ) \n";
                         //Parsing Stuff
                         char t3;
-                        parsingStack->pop(t3);
-                        parsingStack->push(')');
-                        parsingStack->push('E');
-                        parsingStack->push('.');
+                        t3 = parsingStack.top();
+                        parsingStack.pop();
+                        parsingStack.push(')');
+                        parsingStack.push('E');
+                        parsingStack.push('.');
                         //Pointer Manupulations for Tree
-                        addYStack->pop(Y);
-                        addEStack->push(Y->getParent()->getCDR());
+                        Y = addYStack.top();
+                        addYStack.pop();
+                        addEStack.push(Y->getParent()->getCDR());
                         break;
                     case TR_ATOM :
                         if(isVerbose)
                             std::cout << "[INFO] Apply rule Y -> R )  \n";
                         //Parsing Stuff
                         char t4;
-                        parsingStack->pop(t4);
-                        parsingStack->push(')');
-                        parsingStack->push('R');
+                        t4 = parsingStack.top();
+                        parsingStack.pop();
+                        parsingStack.push(')');
+                        parsingStack.push('R');
                         //Pointer Manupulation for Tree
-                        addYStack->pop(Y);
-                        addRStack->push(Y);
+                        Y = addYStack.top();
+                        addYStack.pop();
+                        addRStack.push(Y);
                         break;
                     default :
                         if(isVerbose)
@@ -416,16 +442,15 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
                         std::cout << "[INFO] Apply rule R -> E R  \n";
                         //Parsing Stuff
                         char t1;
-                        parsingStack->pop(t1);
-                        parsingStack->push('R');
-                        parsingStack->push('E');
+                        t1 = parsingStack.top();
+                        parsingStack.pop();
+                        parsingStack.push('R');
+                        parsingStack.push('E');
                         //Pointer Manupulation for Tree
                         E2 = new SExp();
                         R1 = new SExp();
-                        //Check if stack is empty or not
-                        //if(!(addRStack->empty()))
-                        //{
-                        addRStack->pop(R);
+                        R = addRStack.top();
+                        addRStack.pop();
                         //}
                         R->setCAR(E2);
                         R->setCDR(R1);
@@ -435,17 +460,19 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
                         E2->setIsCAR(true);
                         //E = E2;
                         //R = R1;
-                        addEStack->push(E2);
-                        addRStack->push(R1);
+                        addEStack.push(E2);
+                        addRStack.push(R1);
                         break;
                     case TR_RP :
                         if(isVerbose)
                             std::cout << "[INFO] Apply rule R -> epsa   \n";
                         //Parsing Stuff
                         char t2;
-                        parsingStack->pop(t2);
+                        t2 = parsingStack.top();
+                        parsingStack.pop();
                         //Pointer Manupulation for Tree
-                        addRStack->pop(R);
+                        R = addRStack.top();
+                        addRStack.pop();
                         {
                             SExp* parent = R->getParent();
                             if(R->isCAR())
@@ -459,27 +486,23 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
                               std::cout << "[INFO]Apply rule R -> E R   \n";
                         //Parsing Stuff
                         char t3;
-                        parsingStack->pop(t3);
-                        parsingStack->push('R');
-                        parsingStack->push('E');
+                        t3 = parsingStack.top();
+                        parsingStack.pop();
+                        parsingStack.push('R');
+                        parsingStack.push('E');
                         //Pointer Manupulation for Tree
                         E2 = new SExp();
                         R1 = new SExp();
-                        //Check if stack is empty or not
-                        //if(!(addRStack->empty()))
-                        //{
-                        addRStack->pop(R);
-                        //}
+                        R = addRStack.top();
+                        addRStack.pop();
                         R->setCAR(E2);
                         R->setCDR(R1);
                         R1->setParent(R);
                         R1->setIsCAR(false);
                         E2->setParent(R);
                         E2->setIsCAR(true);
-                        //E = E2;
-                        //R = R1;
-                        addEStack->push(E2);
-                        addRStack->push(R1);
+                        addEStack.push(E2);
+                        addRStack.push(R1);
                         break;
                     default :
                         if(isVerbose)
@@ -495,7 +518,8 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
                     {
                         readyForNxtToken = true;
                         char t1;
-                        parsingStack->pop(t1);
+                        t1 = parsingStack.top();
+                        parsingStack.pop();
                     }
                     break;
                 case '(' :
@@ -505,7 +529,8 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
                     {
                         readyForNxtToken = true;
                         char t1;
-                        parsingStack->pop(t1);
+                        t1 = parsingStack.top();
+                        parsingStack.pop();
                     }
                     break;
                 case '.' :
@@ -515,7 +540,8 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
                     {
                         readyForNxtToken = true;
                         char t1;
-                        parsingStack->pop(t1);
+                        t1 = parsingStack.top();
+                        parsingStack.pop();
                     }
                     break;
                 case 'a' :
@@ -525,7 +551,8 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
                     {
                         readyForNxtToken = true;
                         char t1;
-                        parsingStack->pop(t1);
+                        t1 = parsingStack.top();
+                        parsingStack.pop();
                     }
                     break;
                 case '$' :
