@@ -37,7 +37,7 @@ int main(int argc, const char* argv[])
     bool terminate = false;
     bool isVerbose = false;
     do {
-        std::cout << "\n>";
+        std::cout << "\n$";
         std::getline(std::cin,text);
         if(!(std::strcmp(text.c_str(),"quit")))
            terminate = true;
@@ -55,6 +55,7 @@ int main(int argc, const char* argv[])
         {
             SExp* finalSExp = new SExp();
             bool parsingSuccess = getSExpressionTree(text,&finalSExp,isVerbose);
+            std::cout << ">";
             if(parsingSuccess)
                 finalSExp->toString();
             else
