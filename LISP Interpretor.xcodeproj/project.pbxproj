@@ -27,6 +27,8 @@
 
 /* Begin PBXFileReference section */
 		35856B6B16EFE67300499CD1 /* corefunc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = corefunc.h; sourceTree = "<group>"; };
+		35856B6C16EFE7A300499CD1 /* enumstructdecs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = enumstructdecs.h; sourceTree = "<group>"; };
+		35856B6D16EFE82900499CD1 /* stringfunc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stringfunc.h; sourceTree = "<group>"; };
 		35F2382516D82DC60028F7D4 /* LISP Interpretor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "LISP Interpretor"; sourceTree = BUILT_PRODUCTS_DIR; };
 		35F2382816D82DC60028F7D4 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		35F2382A16D82DC60028F7D4 /* LISP_Interpretor.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = LISP_Interpretor.1; sourceTree = "<group>"; };
@@ -69,6 +71,8 @@
 				35F2383116D8324F0028F7D4 /* sexpression.cpp */,
 				35F2383216D8324F0028F7D4 /* sexpression.h */,
 				35856B6B16EFE67300499CD1 /* corefunc.h */,
+				35856B6C16EFE7A300499CD1 /* enumstructdecs.h */,
+				35856B6D16EFE82900499CD1 /* stringfunc.h */,
 			);
 			path = "LISP Interpretor";
 			sourceTree = "<group>";

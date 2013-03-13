@@ -6,30 +6,10 @@
 //  Copyright (c) 2013 Rajaditya Mukherjee. All rights reserved.
 //
 #include <iostream>
-#include <cstdio>
-#include <string>
-#include <map>
-#include <iomanip>
-#include <sstream>
-#include <stack>
-#include <boost/foreach.hpp>
-#include <boost/tokenizer.hpp>
 #include "sexpression.h"
 #include "corefunc.h"
 
-bool isNumber(const std::string& s);
-int convertToNumber(const std::string& s);
-bool getSExpressionTree(std::string text,SExp** S,bool isVerbose);
-int matchingBrace(const std::string &s, int* startCount);
-void populateTableWithPrimitive(std::map<std::string,SExp*> & aMap);
-
-
-enum tokenType {TR_LP,TR_RP,TR_DOT,TR_ATOM,TERM_SYM};
-
-typedef struct {
-    std::string lexval;
-    tokenType type;
-}tokenEntry;
+#define __UNUSED(x) ((void)x)
 
 int main(int argc, const char* argv[])
 {
@@ -70,7 +50,8 @@ int main(int argc, const char* argv[])
             // Get the first token :
             char buffer[20];
 			int copied = sprintf(buffer,"%.19s",inputByLine.c_str());
-            char* firstToken = strtok(buffer," \t");
+        __UNUSED(copied);
+        char* firstToken = strtok(buffer," \t");
 			if (!firstToken)
 			{
 				std::cout <<"[INFO] No Input detected. Parser will not do anything.\n";

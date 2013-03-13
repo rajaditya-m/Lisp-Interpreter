@@ -9,6 +9,75 @@
 #ifndef LISP_Interpretor_corefunc_h
 #define LISP_Interpretor_corefunc_h
 
+#include <vector>
+#include <stack>
+#include <map>
+#include <boost/foreach.hpp>
+#include <boost/tokenizer.hpp>
+#include "enumstructdecs.h"
+#include "stringfunc.h"
+
+void populateTableWithPrimitive(std::map<std::string,SExp*> & aMap)
+{
+	//Map for T
+    SExp* _t = new SExp("T");
+    aMap.insert(std::make_pair("T", _t));
+    //Map for NIL
+    SExp* _nil = new SExp("NIL");
+    aMap.insert(std::make_pair("NIL", _nil));
+    //Map for CAR
+    SExp* _car = new SExp("CAR");
+    aMap.insert(std::make_pair("CAR", _car));
+    //Map for CDR
+    SExp* _cdr = new SExp("CDR");
+    aMap.insert(std::make_pair("CDR", _cdr));
+	//Map for CONS
+    SExp* _cons = new SExp("CONS");
+    aMap.insert(std::make_pair("CONS", _cons));
+	//Map for ATOM
+    SExp* _atom = new SExp("ATOM");
+    aMap.insert(std::make_pair("ATOM", _atom));
+	//Map for EQ
+    SExp* _eq = new SExp("EQ");
+    aMap.insert(std::make_pair("EQ", _eq));
+	//Map for NULL
+    SExp* _null = new SExp("NULL");
+    aMap.insert(std::make_pair("NULL", _null));
+	//Map for INT
+    SExp* _int = new SExp("INT");
+    aMap.insert(std::make_pair("INT", _int));
+	//Map for PLUS
+    SExp* _plus = new SExp("PLUS");
+    aMap.insert(std::make_pair("PLUS", _plus));
+	//Map for MINUS
+    SExp* _minus = new SExp("MINUS");
+    aMap.insert(std::make_pair("MINUS", _minus));
+	//Map for TIMES
+    SExp* _times = new SExp("TIMES");
+    aMap.insert(std::make_pair("TIMES", _times));
+	//Map for QUOTIENT
+    SExp* _quo = new SExp("QUOTIENT");
+    aMap.insert(std::make_pair("QUOTIENT", _quo));
+	//Map for REMAINDER
+    SExp* _rem = new SExp("REMAINDER");
+    aMap.insert(std::make_pair("REMAINDER", _rem));
+	//Map for LESS
+    SExp* _less = new SExp("LESS");
+    aMap.insert(std::make_pair("LESS", _less));
+	//Map for GREATER
+    SExp* _grtr = new SExp("GREATER");
+    aMap.insert(std::make_pair("GREATER", _grtr));
+	//Map for COND
+    SExp* _cond = new SExp("COND");
+    aMap.insert(std::make_pair("COND", _cond));
+	//Map for QUOTE
+    SExp* _quote = new SExp("QUOTE");
+    aMap.insert(std::make_pair("QUOTE", _quote));
+	//Map for DEFUN
+    SExp* _defun = new SExp("DEFUN");
+    aMap.insert(std::make_pair("DEFUN", _defun));
+}
+
 bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
 {
     
@@ -485,102 +554,6 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
     
 }
 
-bool isNumber(const std::string & s)
-{
-    if(s.empty() || ((!std::isdigit(s[0])) && (s[0] != '-') && (s[0] != '+')))
-        return false ;
-    char * p ;
-    std::strtol(s.c_str(), &p, 10) ;
-    return (*p == 0) ;
-}
-
-int convertToNumber(const std::string& s)
-{
-    std::istringstream ss(s);
-    int result;
-    ss >> result ;
-    return result;
-}
-
-int matchingBrace(const std::string & s,int *startCount)
-{
-    int len = s.length();
-    int i ;
-    for ( i = 0;i<len ; i++)
-    {
-        char x = s.at(i);
-		if(x ==' ' || x=='\t')
-			continue;
-        if (x == '(')
-            (*startCount)++;
-        else if(x == ')')
-            (*startCount)--;
-        if((*startCount) == 0)
-            return i;
-    }
-    return -1;
-}
-
-void populateTableWithPrimitive(std::map<std::string,SExp*> & aMap)
-{
-	//Map for T
-    SExp* _t = new SExp("T");
-    aMap.insert(std::make_pair("T", _t));
-    //Map for NIL
-    SExp* _nil = new SExp("NIL");
-    aMap.insert(std::make_pair("NIL", _nil));
-    //Map for CAR
-    SExp* _car = new SExp("CAR");
-    aMap.insert(std::make_pair("CAR", _car));
-    //Map for CDR
-    SExp* _cdr = new SExp("CDR");
-    aMap.insert(std::make_pair("CDR", _cdr));
-	//Map for CONS
-    SExp* _cons = new SExp("CONS");
-    aMap.insert(std::make_pair("CONS", _cons));
-	//Map for ATOM
-    SExp* _atom = new SExp("ATOM");
-    aMap.insert(std::make_pair("ATOM", _atom));
-	//Map for EQ
-    SExp* _eq = new SExp("EQ");
-    aMap.insert(std::make_pair("EQ", _eq));
-	//Map for NULL
-    SExp* _null = new SExp("NULL");
-    aMap.insert(std::make_pair("NULL", _null));
-	//Map for INT
-    SExp* _int = new SExp("INT");
-    aMap.insert(std::make_pair("INT", _int));
-	//Map for PLUS
-    SExp* _plus = new SExp("PLUS");
-    aMap.insert(std::make_pair("PLUS", _plus));
-	//Map for MINUS
-    SExp* _minus = new SExp("MINUS");
-    aMap.insert(std::make_pair("MINUS", _minus));
-	//Map for TIMES
-    SExp* _times = new SExp("TIMES");
-    aMap.insert(std::make_pair("TIMES", _times));
-	//Map for QUOTIENT
-    SExp* _quo = new SExp("QUOTIENT");
-    aMap.insert(std::make_pair("QUOTIENT", _quo));
-	//Map for REMAINDER
-    SExp* _rem = new SExp("REMAINDER");
-    aMap.insert(std::make_pair("REMAINDER", _rem));
-	//Map for LESS
-    SExp* _less = new SExp("LESS");
-    aMap.insert(std::make_pair("LESS", _less));
-	//Map for GREATER
-    SExp* _grtr = new SExp("GREATER");
-    aMap.insert(std::make_pair("GREATER", _grtr));
-	//Map for COND
-    SExp* _cond = new SExp("COND");
-    aMap.insert(std::make_pair("COND", _cond));
-	//Map for QUOTE
-    SExp* _quote = new SExp("QUOTE");
-    aMap.insert(std::make_pair("QUOTE", _quote));
-	//Map for DEFUN
-    SExp* _defun = new SExp("DEFUN");
-    aMap.insert(std::make_pair("DEFUN", _defun));
-}
 
 
 
