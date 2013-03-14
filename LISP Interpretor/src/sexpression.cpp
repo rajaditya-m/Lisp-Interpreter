@@ -64,3 +64,40 @@ void SExp::toString()
 }
 
 
+bool SExp::eqByName(const std::string name)
+{
+    return !(std::strcmp(stringVal_.c_str(),name.c_str()));
+}
+
+bool SExp::getPureEquality(SExp* op)
+{
+    if(isAtom_ && op->isAtom())
+    {
+        if(isString_)
+        {
+            if(op->isString())
+            {
+                if(!(strcmp(stringVal_.c_str(), op->getStringID().c_str())))
+                    return true;
+                else
+                    return false;
+            }
+            else
+                return false;
+        }
+        else
+        {
+            if(op->isString())
+                return false;
+            else
+            {
+                if(intVal_ == op->getIntegerID())
+                    return true;
+                else
+                    return false;
+            }
+        }
+    }
+    return false;
+}
+

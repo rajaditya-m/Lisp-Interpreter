@@ -17,5 +17,7 @@ typedef struct {
     tokenType type;
 }tokenEntry;
 
+typedef std::map<std::string,SExp*> SExpMap;
+
 
 #endif

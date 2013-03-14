@@ -41,7 +41,10 @@ public:
     SExp(int val);
     SExp(string str);
     SExp(SExp* cr,SExp* cd);
+    void applyCons(SExp* car, SExp* cdr);
     void toString();
+    bool eqByName(std::string name);
+    bool getPureEquality(SExp* op);
     
 private:
     SExp* car_;

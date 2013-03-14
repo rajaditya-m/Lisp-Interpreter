@@ -8,11 +8,19 @@
 #include <iostream>
 #include "sexpression.h"
 #include "corefunc.h"
+#include "coreintfunc.h"
 
 #define __UNUSED(x) ((void)x)
 
 int main(int argc, const char* argv[])
 {
+    //Map for atomic expressions
+    SExpMap atomicExpMap;
+    //Initialize the map with the primitives
+    populateTableWithPrimitive(atomicExpMap);
+    //Get some primitives handy
+    SExp* nilExp = atomicExpMap.find("NIL")->second;
+    
 	std::cout << "*******************************************************************************************\n";
     std::cout << "**                           LISP Interpreter Project 6341                               **\n";
 	std::cout << "**                  (C) Rajaditya Mukherjee {mukherjee.62@osu.edu}                       **\n";
@@ -115,14 +123,23 @@ int main(int argc, const char* argv[])
                 }
             }
             SExp* finalSExp = new SExp();
-            bool parsingSuccess = getSExpressionTree(text,&finalSExp,isVerbose);
+            bool parsingSuccess = getSExpressionTree(text,&finalSExp,isVerbose,atomicExpMap);
             std::cout << ">";
             if(parsingSuccess)
-                finalSExp->toString();
+            {
+                //finalSExp->toString();
+                bool result;
+                SExp* resultExp = evalFunc(&result, finalSExp, nilExp, &nilExp, atomicExpMap);
+                if(result)
+                    resultExp->toString();
+                else
+                    std::cout << "[ERROR] Evaluation Failed.";
+            }
             else
                 std::cout << "[ERROR] Parsing Failed. More information can be found in Verbose Mode.";
         }
     } while (!terminate);
+    
     std::cout << "[INFO] LISP Interpreter exited successfully.";
     return 0;
     

@@ -17,7 +17,7 @@
 #include "enumstructdecs.h"
 #include "stringfunc.h"
 
-void populateTableWithPrimitive(std::map<std::string,SExp*> & aMap)
+void populateTableWithPrimitive(SExpMap & aMap)
 {
 	//Map for T
     SExp* _t = new SExp("T");
@@ -78,7 +78,7 @@ void populateTableWithPrimitive(std::map<std::string,SExp*> & aMap)
     aMap.insert(std::make_pair("DEFUN", _defun));
 }
 
-bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
+bool getSExpressionTree(std::string text,SExp** S,bool isVerbose,SExpMap & atomicExpMap)
 {
     
     //Tokenize the strings
@@ -118,12 +118,13 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose)
     
     if(isVerbose)
         std::cout << "[INFO] Tokenization sucessfully completed\n";
-    
+    /*
     //Map for atomic expressions
-    std::map<std::string,SExp*> atomicExpMap;
+    SExpMap atomicExpMap;
     
 	//Populate with primitives
 	populateTableWithPrimitive(atomicExpMap);
+    */
     
     //Parser for S Expression
     std::stack<char> parsingStack;
