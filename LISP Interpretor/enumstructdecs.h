@@ -12,12 +12,16 @@
 
 enum tokenType {TR_LP,TR_RP,TR_DOT,TR_ATOM,TERM_SYM};
 
+enum errCode {T_LIST,T_ATOM,T_NUMLIST,T_NUM,T_RESERVED,T_OK};
+
 typedef struct {
     std::string lexval;
     tokenType type;
 }tokenEntry;
 
 typedef std::map<std::string,SExp*> SExpMap;
+
+const char *reservedWords[] = {"T","NIL","CAR","CDR","CONS","ATOM","EQ","NULL","INT","PLUS","MINUS","TIMES","QUOTIENT","REMAINDER","LESS","GREATER","COND","QUOTE","DEFUN"};
 
 
 #endif

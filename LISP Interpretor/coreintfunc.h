@@ -11,6 +11,7 @@
 
 #include "sexpression.h"
 #include "corefunc.h"
+#include "sanitychecks.h"
 
 SExp* evlistFunc(bool* status,SExp* list,SExp* aList,SExp* dList,const SExpMap &aMap);
 SExp* applyFunc(bool* status,SExp* funcName,SExp* body,SExp* aList,SExp* dList,const SExpMap &aMap);
@@ -71,10 +72,63 @@ SExp* evalFunc(bool* status,SExp* exp,SExp* aList,SExp** dList,const SExpMap &aM
         }
         else if(exp->getCAR()->eqByName("DEFUN"))
         {
-            SExp* fName = exp->getCDR()->getCAR();
-            SExp* pList = exp->getCDR()->getCDR()->getCAR();
-            SExp* fBody = exp->getCDR()->getCDR()->getCDR()->getCAR();
-            
+            SExp *fName, *pList,*fBody;
+            if(exp->getCDR()->isAtom())
+            {
+                *status = false;
+                if(exp->getCDR()->isNull())
+                    std::cout << "[ERROR] DEFUN Function requires three more arguments : Name, Parameter List and Function Body.\n";
+                else
+                    std::cout << "[ERROR] DEFUN Function requires specification of arguments as lists, not in DOT notation.\n";
+                return NULL;
+            }
+            else
+            {
+                fName = exp->getCDR()->getCAR();
+                if(exp->getCDR()->getCDR()->isAtom())
+                {
+                    *status = false;
+                    if(exp->getCDR()->getCDR()->isNull())
+                        std::cout << "[ERROR] DEFUN Function requires two more arguments : Parameter List and Function Body.\n";
+                    else
+                        std::cout << "[ERROR] DEFUN Function requires specification of arguments as lists, not in DOT notation.\n";
+                    return NULL;
+                }
+                pList = exp->getCDR()->getCDR()->getCAR();
+                if(exp->getCDR()->getCDR()->getCDR()->isAtom())
+                {
+                    *status = false;
+                    if(exp->getCDR()->getCDR()->getCDR()->isNull())
+                        std::cout << "[ERROR] DEFUN Function requires one more argument : Function Body.\n";
+                    else
+                        std::cout << "[ERROR] DEFUN Function requires specification of arguments as lists, not in DOT notation.\n";
+                    return NULL;
+                }
+                fBody = exp->getCDR()->getCDR()->getCDR()->getCAR();
+            }
+            //Sanity check for function names.
+            errCode fNameSanChk = checkFunctionName(fName);
+            if(fNameSanChk!=T_OK)
+            {
+                *status = false;
+                if(fNameSanChk==T_LIST)
+                    std::cout <<"[ERROR] Function name is a list. Please give an atomic string as name.\n";
+                else if(fNameSanChk==T_NUM)
+                    std::cout <<"[ERROR] Function name is a number. Please give an string as name.\n";
+                else if(fNameSanChk==T_RESERVED)
+                    std::cout <<"[ERROR] Function name is a reserved primitive. Please select a new name.\n";
+                return NULL;
+            }
+            //Sanity checks for Parameters
+            errCode pLSanChk = checkFunctionParams(pList);
+            if(pLSanChk!=T_OK)
+            {
+                *status = false;
+                if(pLSanChk==T_ATOM)
+                    std::cout <<"[ERROR] Function parameter list is an atom. Please specify it in the form of a list.\n";
+                return NULL;
+            }
+            *status = true;
             SExp* new1 = new SExp(pList,fBody);
             SExp* entry = new SExp(fName,new1);
             
@@ -185,12 +239,23 @@ SExp* evlistFunc(bool* status,SExp* list,SExp* aList,SExp* dList,const SExpMap &
         *status = true;
         return list;
     }
+    else if(list->isAtom())
+    {
+        *status = false;
+        return NULL;
+    }
     else
     {
         bool success1,success2;
         SExp* res1 = evalFunc(&success1,list->getCAR() , aList, &dList,aMap);
         SExp* res2 = evlistFunc(&success2, list->getCDR(), aList, dList,aMap);
         bool final = success1 & success2;
+        if(!success1)
+        {
+            std::cout << "[ERROR] Error evaluating ";
+            list->getCAR()->toString();
+            std::cout << " expression.\n";
+        }
         *status = final;
         if(final)
         {
@@ -237,6 +302,7 @@ SExp* applyFunc(bool* status,SExp* funcName,SExp* body,SExp* aList,SExp* dList,c
         }
         else if(funcName->eqByName("EQ"))
         {
+            *status = true;
             SExp* e1 = body->getCAR();
             SExp* e2 = body->getCDR()->getCAR();
             bool res = e1->getPureEquality(e2);
@@ -247,6 +313,242 @@ SExp* applyFunc(bool* status,SExp* funcName,SExp* body,SExp* aList,SExp* dList,c
             else
             {
                 return aMap.find("NIL")->second;
+            }
+        }
+        else if(funcName->eqByName("NULL"))
+        {
+            *status = true;
+            bool res = body->getCAR()->isNull();
+            if(res)
+            {
+                return aMap.find("T")->second;
+            }
+            else
+            {
+                return aMap.find("NIL")->second;
+            }
+        }
+        else if(funcName->eqByName("INT"))
+        {
+            *status = true;
+            bool res=false;
+            if(body->getCAR()->isAtom())
+            {
+                if(body->getCAR()->isString())
+                    res = false;
+                else
+                    res = true;
+            }
+            if(res)
+            {
+                return aMap.find("T")->second;
+            }
+            else
+            {
+                return aMap.find("NIL")->second;
+            }
+        }
+        else if (funcName->eqByName("PLUS"))
+        {
+            
+            SExp* op1 = body->getCAR();
+            SExp* op2 = body->getCDR()->getCAR();
+            if(op1->isAtom() && op2->isAtom())
+            {
+                if(!(op1->isString() || op2->isString()))
+                {
+                    *status = true;
+                    int result = op1->getIntegerID() + op2->getIntegerID();
+                    SExp* newsexp = new SExp(result);
+                    return newsexp;
+                }
+                else
+                {
+                    *status = false;
+                    std::cout << "[ERROR] Integer operands expected for PLUS primitive function.\n";
+                    return NULL;
+                }
+            }
+            else
+            {
+                *status = false;
+                std::cout << "[ERROR] Integer operands expected for PLUS primitive function.\n";
+                return NULL;
+            }
+        }
+        else if (funcName->eqByName("MINUS"))
+        {
+            SExp* op1 = body->getCAR();
+            SExp* op2 = body->getCDR()->getCAR();
+            if(op1->isAtom() && op2->isAtom())
+            {
+                if(!(op1->isString() || op2->isString()))
+                {
+                    *status = true;
+                    int result = op1->getIntegerID() - op2->getIntegerID();
+                    SExp* newsexp = new SExp(result);
+                    return newsexp;
+                }
+                else
+                {
+                    *status = false;
+                    std::cout << "[ERROR] Integer operands expected for MINUS primitive function.\n";
+                    return NULL;
+                }
+            }
+            else
+            {
+                *status = false;
+                std::cout << "[ERROR] Integer operands expected for MINUS primitive function.\n";
+                return NULL;
+            }
+        }
+        else if (funcName->eqByName("TIMES"))
+        {
+            SExp* op1 = body->getCAR();
+            SExp* op2 = body->getCDR()->getCAR();
+            if(op1->isAtom() && op2->isAtom())
+            {
+                if(!(op1->isString() || op2->isString()))
+                {
+                    *status = true;
+                    int result = op1->getIntegerID() * op2->getIntegerID();
+                    SExp* newsexp = new SExp(result);
+                    return newsexp;
+                }
+                else
+                {
+                    *status = false;
+                    std::cout << "[ERROR] Integer operands expected for TIMES primitive function.\n";
+                    return NULL;
+                }
+            }
+            else
+            {
+                *status = false;
+                std::cout << "[ERROR] Integer operands expected for TIMES primitive function.\n";
+                return NULL;
+            }
+        }
+        else if (funcName->eqByName("QUOTIENT"))
+        {
+            SExp* op1 = body->getCAR();
+            SExp* op2 = body->getCDR()->getCAR();
+            if(op1->isAtom() && op2->isAtom())
+            {
+                if(!(op1->isString() || op2->isString()))
+                {
+                    *status = true;
+                    int result = op1->getIntegerID() / op2->getIntegerID();
+                    SExp* newsexp = new SExp(result);
+                    return newsexp;
+                }
+                else
+                {
+                    *status = false;
+                    std::cout << "[ERROR] Integer operands expected for QUOTIENT primitive function.\n";
+                    return NULL;
+                }
+            }
+            else
+            {
+                *status = false;
+                std::cout << "[ERROR] Integer operands expected for QUOTIENT primitive function.\n";
+                return NULL;
+            }
+        }
+        else if (funcName->eqByName("REMAINDER"))
+        {
+            SExp* op1 = body->getCAR();
+            SExp* op2 = body->getCDR()->getCAR();
+            if(op1->isAtom() && op2->isAtom())
+            {
+                if(!(op1->isString() || op2->isString()))
+                {
+                    *status = true;
+                    int result = op1->getIntegerID() % op2->getIntegerID();
+                    SExp* newsexp = new SExp(result);
+                    return newsexp;
+                }
+                else
+                {
+                    *status = false;
+                    std::cout << "[ERROR] Integer operands expected for REMAINDER primitive function.\n";
+                    return NULL;
+                }
+            }
+            else
+            {
+                *status = false;
+                std::cout << "[ERROR] Integer operands expected for REMAINDER primitive function.\n";
+                return NULL;
+            }
+        }
+        else if (funcName->eqByName("LESS"))
+        {
+            
+            SExp* op1 = body->getCAR();
+            SExp* op2 = body->getCDR()->getCAR();
+            if(op1->isAtom() && op2->isAtom())
+            {
+                if(!(op1->isString() || op2->isString()))
+                {
+                    *status = true;
+                    bool result = op1->getIntegerID() < op2->getIntegerID();
+                    if(result)
+                    {
+                        return aMap.find("T")->second;
+                    }
+                    else
+                    {
+                        return aMap.find("NIL")->second;
+                    }
+                }
+                else
+                {
+                    *status = false;
+                    std::cout << "[ERROR] Integer operands expected for LESS primitive function.\n";
+                    return NULL;
+                }
+            }
+            else
+            {
+                *status = false;
+                std::cout << "[ERROR] Integer operands expected for LESS primitive function.\n";
+                return NULL;
+            }
+        }
+        else if (funcName->eqByName("GREATER"))
+        {
+            SExp* op1 = body->getCAR();
+            SExp* op2 = body->getCDR()->getCAR();
+            if(op1->isAtom() && op2->isAtom())
+            {
+                if(!(op1->isString() || op2->isString()))
+                {
+                    *status = true;
+                    bool result = op1->getIntegerID() > op2->getIntegerID();
+                    if(result)
+                    {
+                        return aMap.find("T")->second;
+                    }
+                    else
+                    {
+                        return aMap.find("NIL")->second;
+                    }
+                }
+                else
+                {
+                    *status = false;
+                    std::cout << "[ERROR] Integer operands expected for GREATER primitive function.\n";
+                    return NULL;
+                }
+            }
+            else
+            {
+                *status = false;
+                std::cout << "[ERROR] Integer operands expected for GREATER primitive function.\n";
+                return NULL;
             }
         }
         else
@@ -262,7 +564,9 @@ SExp* applyFunc(bool* status,SExp* funcName,SExp* body,SExp* aList,SExp* dList,c
             else
             {
                 *status = false;
-                std::cout << "[ERROR] Function that you are trying to apply is not defined yet.\n";
+                std::cout << "[ERROR] Function ";
+                funcName->toString();
+                std::cout << "that you are trying to apply is not defined yet.\n";
                 return NULL;
             }
         }

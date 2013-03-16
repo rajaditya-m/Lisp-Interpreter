@@ -101,3 +101,29 @@ bool SExp::getPureEquality(SExp* op)
     return false;
 }
 
+void SExp::toListFormat()
+{
+    if(isAtom_)
+    {
+        if(isString_)
+            std::cout << stringVal_ ;
+        else
+            std::cout << intVal_ ;
+        return ;
+    }
+    else if(isNull())
+    {
+        return;
+    }
+    else
+    {
+        std::cout << "(" ;
+        if(car_)
+            car_->toListFormat();
+        std::cout << " ";
+        if(cdr_)
+            cdr_->toListFormat();
+        std::cout << ")";
+    }
+}
+

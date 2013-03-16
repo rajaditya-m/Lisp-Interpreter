@@ -26,6 +26,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		355F4B6B16F531EE0055BC0A /* sanitychecks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sanitychecks.h; sourceTree = "<group>"; };
 		35856B6B16EFE67300499CD1 /* corefunc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = corefunc.h; sourceTree = "<group>"; };
 		35856B6C16EFE7A300499CD1 /* enumstructdecs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = enumstructdecs.h; sourceTree = "<group>"; };
 		35856B6D16EFE82900499CD1 /* stringfunc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stringfunc.h; sourceTree = "<group>"; };
@@ -75,6 +76,7 @@
 				35856B6C16EFE7A300499CD1 /* enumstructdecs.h */,
 				35856B6D16EFE82900499CD1 /* stringfunc.h */,
 				35856B6E16F0011900499CD1 /* coreintfunc.h */,
+				355F4B6B16F531EE0055BC0A /* sanitychecks.h */,
 			);
 			path = "LISP Interpretor";
 			sourceTree = "<group>";

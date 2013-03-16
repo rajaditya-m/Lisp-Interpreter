@@ -43,6 +43,7 @@ public:
     SExp(SExp* cr,SExp* cd);
     void applyCons(SExp* car, SExp* cdr);
     void toString();
+    void toListFormat();
     bool eqByName(std::string name);
     bool getPureEquality(SExp* op);
     
