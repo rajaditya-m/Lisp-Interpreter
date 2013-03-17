@@ -132,8 +132,8 @@ int main(int argc, const char* argv[])
                 SExp* resultExp = evalFunc(&result, finalSExp, nilExp, &nilExp, atomicExpMap);
                 if(result)
                     resultExp->toString();
-                else
-                    std::cout << "[ERROR] Evaluation Failed.";
+                //else
+                //    std::cout << "[ERROR] Evaluation Failed.";
             }
             else
                 std::cout << "[ERROR] Parsing Failed. More information can be found in Verbose Mode.";

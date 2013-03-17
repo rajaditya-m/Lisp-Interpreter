@@ -169,19 +169,6 @@ SExp* evalFunc(bool* status,SExp* exp,SExp* aList,SExp** dList,const SExpMap &aM
     }
 }
 
-bool searchInList(SExp* exp,SExp* aList)
-{
-    if(exp->isNull() || aList->isNull())
-    {
-        return false;
-    }
-    else if(aList->getCAR()->getCAR()->eqByName(exp->getStringID().c_str()))
-    {
-        return true;
-    }
-    else return searchInList(exp, aList->getCDR());
-}
-
 SExp* getValFromList(SExp* exp,SExp* aList)
 {
     if(aList->getCAR()->getCAR()->eqByName(exp->getStringID().c_str()))
@@ -557,7 +544,34 @@ SExp* applyFunc(bool* status,SExp* funcName,SExp* body,SExp* aList,SExp* dList,c
             if(sanityCheck)
             {
                 SExp* dataFromDList = getValFromList(funcName, dList);
-                //@TODO:Put some sanity check here for number of parameters matching
+                //Sanity check here for number of parameters matching
+                int nosFParams = numberOfElems(dataFromDList->getCAR());
+                int nosAParams = numberOfElems(body);
+                if(nosAParams==-1)
+                {
+                    *status = false;
+                    std::cout << "[ERROR] Arguments to Function ";
+                    funcName->toString();
+                    std::cout << "is not in the form of a proper list.\n";
+                    return NULL;
+                }
+                if(nosFParams!=nosAParams)
+                {
+                    *status = false;
+                    if(nosAParams<nosFParams)
+                    {
+                        std::cout << "[ERROR] Too few arguments to function ";
+                        funcName->toString();
+                        std::cout << ".\n";
+                    }
+                    else
+                    {
+                        std::cout << "[ERROR] Too many arguments to function ";
+                        funcName->toString();
+                        std::cout << ".\n";
+                    }
+                    return NULL;
+                }
                 SExp* newAList = addPairs(dataFromDList->getCAR(),body,aList);
                 return evalFunc(status, dataFromDList->getCDR(),newAList, &dList,aMap);
             }

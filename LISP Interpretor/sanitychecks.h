@@ -33,10 +33,40 @@ errCode checkFunctionName(SExp* fName)
 
 errCode checkFunctionParams(SExp* fName)
 {
-    if(fName->isAtom())
+    if(fName->isNull())
+        return T_OK;
+    else if(fName->isAtom())
         return T_ATOM;
     else
         return T_OK;
+}
+
+bool searchInList(SExp* exp,SExp* aList)
+{
+    if(exp->isNull() || aList->isNull())
+    {
+        return false;
+    }
+    else if(aList->getCAR()->getCAR()->eqByName(exp->getStringID().c_str()))
+    {
+        return true;
+    }
+    else return searchInList(exp, aList->getCDR());
+}
+
+int numberOfElems(SExp* list)
+{
+    if(list->isAtom())
+    {
+        if(list->isNull())
+            return 0;
+        else
+            return -1;
+    }
+    else
+    {
+        return 1+numberOfElems(list->getCDR());
+    }
 }
 
 #endif
