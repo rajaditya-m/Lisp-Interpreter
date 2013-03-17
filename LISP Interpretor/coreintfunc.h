@@ -183,17 +183,37 @@ SExp* evconFunc(bool* status,SExp* beList,SExp* aList,SExp* dList,const SExpMap 
     if(beList->isNull())
     {
         *status = false;
+        std::cout << "[ERROR] COND statement must have atleast one conditional clause.\n";
         return NULL;
     }
     else
     {
         bool successOfEval;
+        int nosPairs = numberOfElems(beList->getCAR());
+        if(nosPairs!=2)
+        {
+            *status = false;
+            std::cout << "[ERROR] COND statement clause is empty or not of the form (EXP EXP).\n";
+            return NULL;
+        }
+        /*if(beList->getCAR()->isAtom())
+        {
+            *status = false;
+            std::cout << "[ERROR] COND statement clause is empty or not of the form (EXP EXP).\n";
+            return NULL;
+        }*/
         SExp* res1 = evalFunc(&successOfEval, beList->getCAR()->getCAR(), aList, &dList,aMap);
         if(successOfEval)
         {
             if(!(res1->eqByName("NIL")))
             {
                 bool successOf2ndEval;
+                if(beList->getCAR()->getCDR()->isAtom())
+                {
+                    *status = false;
+                    std::cout << "[ERROR] COND statement clause is not of the form (EXP EXP).\n";
+                    return NULL;
+                }
                 SExp* res2 = evalFunc(&successOf2ndEval,beList->getCAR()->getCDR()->getCAR(),aList,&dList,aMap);
                 if(successOf2ndEval)
                 {
@@ -208,6 +228,12 @@ SExp* evconFunc(bool* status,SExp* beList,SExp* aList,SExp* dList,const SExpMap 
             }
             else
             {
+                if(beList->getCDR()->isNull())
+                {
+                    *status = false;
+                    std::cout << "[ERROR] COND Statement must have atleast one clause which evaluates to T.\n";
+                    return NULL;
+                }
                 return evconFunc(status,beList->getCDR(), aList, dList,aMap);
             }
         }
