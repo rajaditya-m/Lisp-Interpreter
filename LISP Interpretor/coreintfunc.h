@@ -57,6 +57,13 @@ SExp* evalFunc(bool* status,SExp* exp,SExp* aList,SExp** dList,const SExpMap &aM
     {
         if(exp->getCAR()->eqByName("QUOTE"))
         {
+            int nosElems = numberOfElems(exp->getCDR());
+            if(nosElems!=1)
+            {
+                *status = false;
+                std::cout << "[ERROR] QUOTE expression is malformed.\n";
+                return NULL;
+            }
             *status = true;
             return exp->getCDR()->getCAR();
         }
@@ -196,12 +203,6 @@ SExp* evconFunc(bool* status,SExp* beList,SExp* aList,SExp* dList,const SExpMap 
             std::cout << "[ERROR] COND statement clause is empty or not of the form (EXP EXP).\n";
             return NULL;
         }
-        /*if(beList->getCAR()->isAtom())
-        {
-            *status = false;
-            std::cout << "[ERROR] COND statement clause is empty or not of the form (EXP EXP).\n";
-            return NULL;
-        }*/
         SExp* res1 = evalFunc(&successOfEval, beList->getCAR()->getCAR(), aList, &dList,aMap);
         if(successOfEval)
         {
@@ -286,22 +287,60 @@ SExp* applyFunc(bool* status,SExp* funcName,SExp* body,SExp* aList,SExp* dList,c
     {
         if(funcName->eqByName("CAR"))
         {
+            if(body->isNull())
+            {
+                *status = false;
+                std::cout <<"[ERROR] No arguments to CAR found.\n";
+                return NULL;
+            }
+            else if(body->getCAR()->isAtom())
+            {
+                *status = false;
+                std::cout <<"[ERROR] You are trying to apply CAR to an atomic expression.\n";
+                return NULL;
+            }
             *status = true;
             return body->getCAR()->getCAR();
         }
         else if (funcName->eqByName("CDR"))
         {
+            if(body->isNull())
+            {
+                *status = false;
+                std::cout <<"[ERROR] No arguments to CDR found.\n";
+                return NULL;
+            }
+            else if(body->getCAR()->isAtom())
+            {
+                *status = false;
+                std::cout <<"[ERROR] You are trying to apply CDR to an atomic expression.\n";
+                return NULL;
+            }
             *status = true;
             return body->getCAR()->getCDR();
         }
         else if(funcName->eqByName("CONS"))
         {
+            int nosElems = numberOfElems(body);
+            if(nosElems!=2)
+            {
+                *status = false;
+                std::cout <<"[ERROR] Input specification to CONS is not correct.\n";
+                return NULL;
+            }
             *status = true;
             SExp* newSExp = new SExp(body->getCAR(),body->getCDR()->getCAR());
             return newSExp;
         }
         else if(funcName->eqByName("ATOM"))
         {
+            int nosElems = numberOfElems(body);
+            if(nosElems!=1)
+            {
+                *status = false;
+                std::cout <<"[ERROR] Input specification to ATOM is not correct.\n";
+                return NULL;
+            }
             *status = true;
             bool res = body->getCAR()->isAtom();
             if(res)
@@ -315,6 +354,13 @@ SExp* applyFunc(bool* status,SExp* funcName,SExp* body,SExp* aList,SExp* dList,c
         }
         else if(funcName->eqByName("EQ"))
         {
+            int nosElems = numberOfElems(body);
+            if(nosElems!=2)
+            {
+                *status = false;
+                std::cout <<"[ERROR] Input specification to EQ is not correct.\n";
+                return NULL;
+            }
             *status = true;
             SExp* e1 = body->getCAR();
             SExp* e2 = body->getCDR()->getCAR();
@@ -330,6 +376,13 @@ SExp* applyFunc(bool* status,SExp* funcName,SExp* body,SExp* aList,SExp* dList,c
         }
         else if(funcName->eqByName("NULL"))
         {
+            int nosElems = numberOfElems(body);
+            if(nosElems!=1)
+            {
+                *status = false;
+                std::cout <<"[ERROR] Input specification to NULL is not correct.\n";
+                return NULL;
+            }
             *status = true;
             bool res = body->getCAR()->isNull();
             if(res)
@@ -343,6 +396,14 @@ SExp* applyFunc(bool* status,SExp* funcName,SExp* body,SExp* aList,SExp* dList,c
         }
         else if(funcName->eqByName("INT"))
         {
+            
+            int nosElems = numberOfElems(body);
+            if(nosElems!=1)
+            {
+                *status = false;
+                std::cout <<"[ERROR] Input specification to INT is not correct.\n";
+                return NULL;
+            }
             *status = true;
             bool res=false;
             if(body->getCAR()->isAtom())
@@ -363,7 +424,13 @@ SExp* applyFunc(bool* status,SExp* funcName,SExp* body,SExp* aList,SExp* dList,c
         }
         else if (funcName->eqByName("PLUS"))
         {
-            
+            int nosElems = numberOfElems(body);
+            if(nosElems!=2)
+            {
+                *status = false;
+                std::cout <<"[ERROR] Input specification to PLUS is not correct.\n";
+                return NULL;
+            }
             SExp* op1 = body->getCAR();
             SExp* op2 = body->getCDR()->getCAR();
             if(op1->isAtom() && op2->isAtom())
@@ -391,6 +458,13 @@ SExp* applyFunc(bool* status,SExp* funcName,SExp* body,SExp* aList,SExp* dList,c
         }
         else if (funcName->eqByName("MINUS"))
         {
+            int nosElems = numberOfElems(body);
+            if(nosElems!=2)
+            {
+                *status = false;
+                std::cout <<"[ERROR] Input specification to MINUS is not correct.\n";
+                return NULL;
+            }
             SExp* op1 = body->getCAR();
             SExp* op2 = body->getCDR()->getCAR();
             if(op1->isAtom() && op2->isAtom())
@@ -418,6 +492,13 @@ SExp* applyFunc(bool* status,SExp* funcName,SExp* body,SExp* aList,SExp* dList,c
         }
         else if (funcName->eqByName("TIMES"))
         {
+            int nosElems = numberOfElems(body);
+            if(nosElems!=2)
+            {
+                *status = false;
+                std::cout <<"[ERROR] Input specification to TIMES is not correct.\n";
+                return NULL;
+            }
             SExp* op1 = body->getCAR();
             SExp* op2 = body->getCDR()->getCAR();
             if(op1->isAtom() && op2->isAtom())
@@ -445,12 +526,25 @@ SExp* applyFunc(bool* status,SExp* funcName,SExp* body,SExp* aList,SExp* dList,c
         }
         else if (funcName->eqByName("QUOTIENT"))
         {
+            int nosElems = numberOfElems(body);
+            if(nosElems!=2)
+            {
+                *status = false;
+                std::cout <<"[ERROR] Input specification to QUOTIENT is not correct.\n";
+                return NULL;
+            }
             SExp* op1 = body->getCAR();
             SExp* op2 = body->getCDR()->getCAR();
             if(op1->isAtom() && op2->isAtom())
             {
                 if(!(op1->isString() || op2->isString()))
                 {
+                    if(op2->getIntegerID()==0)
+                    {
+                        *status = false;
+                        std::cout << "[ERROR] Attempted division by 0 in QUOTIENT operation.\n";
+                        return NULL;
+                    }
                     *status = true;
                     int result = op1->getIntegerID() / op2->getIntegerID();
                     SExp* newsexp = new SExp(result);
@@ -472,12 +566,25 @@ SExp* applyFunc(bool* status,SExp* funcName,SExp* body,SExp* aList,SExp* dList,c
         }
         else if (funcName->eqByName("REMAINDER"))
         {
+            int nosElems = numberOfElems(body);
+            if(nosElems!=2)
+            {
+                *status = false;
+                std::cout <<"[ERROR] Input specification to REMAINDER is not correct.\n";
+                return NULL;
+            }
             SExp* op1 = body->getCAR();
             SExp* op2 = body->getCDR()->getCAR();
             if(op1->isAtom() && op2->isAtom())
             {
                 if(!(op1->isString() || op2->isString()))
                 {
+                    if(op2->getIntegerID()==0)
+                    {
+                        *status = false;
+                        std::cout << "[ERROR] Attempted division by 0 in REMAINDER operation.\n";
+                        return NULL;
+                    }
                     *status = true;
                     int result = op1->getIntegerID() % op2->getIntegerID();
                     SExp* newsexp = new SExp(result);
@@ -499,7 +606,13 @@ SExp* applyFunc(bool* status,SExp* funcName,SExp* body,SExp* aList,SExp* dList,c
         }
         else if (funcName->eqByName("LESS"))
         {
-            
+            int nosElems = numberOfElems(body);
+            if(nosElems!=2)
+            {
+                *status = false;
+                std::cout <<"[ERROR] Input specification to LESS is not correct.\n";
+                return NULL;
+            }
             SExp* op1 = body->getCAR();
             SExp* op2 = body->getCDR()->getCAR();
             if(op1->isAtom() && op2->isAtom())
@@ -533,6 +646,13 @@ SExp* applyFunc(bool* status,SExp* funcName,SExp* body,SExp* aList,SExp* dList,c
         }
         else if (funcName->eqByName("GREATER"))
         {
+            int nosElems = numberOfElems(body);
+            if(nosElems!=2)
+            {
+                *status = false;
+                std::cout <<"[ERROR] Input specification to GREATER is not correct.\n";
+                return NULL;
+            }
             SExp* op1 = body->getCAR();
             SExp* op2 = body->getCDR()->getCAR();
             if(op1->isAtom() && op2->isAtom())

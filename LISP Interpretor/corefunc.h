@@ -243,10 +243,18 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose,SExpMap & atomi
 							else
 							{
 								SExp* parent = E->getParent();
+                                if(!parent)
+                                {
+                                    *S = atomicExpMap.find(curTok.lexval)->second;
+                                    return true;
+                                }
+                                else
+                                {
 								if(E->isCAR())
 									parent->setCAR((atomicExpMap.find(curTok.lexval)->second));
 								else
 									parent->setCDR((atomicExpMap.find(curTok.lexval)->second));
+                                }
 							}
 							if(isVerbose)
 								std::cout << "[INFO] Atom processed is " << curTok.lexval << "\n";
