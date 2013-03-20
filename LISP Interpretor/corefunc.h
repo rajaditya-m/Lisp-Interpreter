@@ -105,6 +105,17 @@ bool getSExpressionTree(std::string text,SExp** S,bool isVerbose,SExpMap & atomi
         }
         else
         {
+            strErrCode res = checkSanityOfToken(t.c_str());
+            if(res == S_LC)
+            {
+                std::cout << "[ERROR] Lowercase character is found in token '"<< t.c_str() << "'.\n";
+                return false;
+            }
+            else if(res == S_SPC)
+            {
+                std::cout << "[ERROR] Special character is found in token '"<< t.c_str() << "'.\n";
+                return false;
+            }
             tk->type = TR_ATOM;
         }
         tokenList.push_back(*tk);

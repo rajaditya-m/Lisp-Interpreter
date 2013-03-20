@@ -14,6 +14,8 @@ enum tokenType {TR_LP,TR_RP,TR_DOT,TR_ATOM,TERM_SYM};
 
 enum errCode {T_LIST,T_ATOM,T_NUMLIST,T_NUM,T_RESERVED,T_OK};
 
+enum strErrCode {S_OK,S_LC,S_SPC};
+
 typedef struct {
     std::string lexval;
     tokenType type;

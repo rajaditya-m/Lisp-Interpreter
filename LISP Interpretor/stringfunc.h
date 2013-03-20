@@ -48,6 +48,20 @@ int matchingBrace(const std::string & s,int *startCount)
     return -1;
 }
 
-
+strErrCode checkSanityOfToken(const std::string & s)
+{
+    long len = s.length();
+    for(int i=0;i<len;i++)
+    {
+        char x = s.at(i);
+        if((x>=65 && x<=90) || (x>=48 && x<=57) || x=='-' || x=='+')
+            continue;
+        else if(x>=97 && x<=122)
+            return S_LC;
+        else
+            return S_SPC;
+    }
+    return S_OK;
+}
 
 #endif
