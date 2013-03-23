@@ -256,6 +256,7 @@ SExp* evlistFunc(bool* status,SExp* list,SExp* aList,SExp* dList,const SExpMap &
     else if(list->isAtom())
     {
         *status = false;
+		std::cout << "[ERROR] The arguments passed are expected to be a list/NULL but is an atom.\n";
         return NULL;
     }
     else

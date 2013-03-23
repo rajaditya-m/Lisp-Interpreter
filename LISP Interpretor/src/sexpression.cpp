@@ -15,6 +15,7 @@ SExp::SExp()
     isAtom_ = false;
     isString_ = false;
     isCAR_ = false;
+	parent_ = NULL;
 }
 
 SExp::SExp(int val)
@@ -24,6 +25,7 @@ SExp::SExp(int val)
     isAtom_ = true;
     isString_ = false;
     isCAR_ = false;
+	parent_ = NULL;
 }
 
 SExp::SExp(string str)
@@ -33,6 +35,7 @@ SExp::SExp(string str)
     isAtom_ = true;
     isString_ = true;
     isCAR_ = false;
+	parent_ = NULL;
 }
 
 SExp::SExp(SExp* cr,SExp* cd)
@@ -42,6 +45,7 @@ SExp::SExp(SExp* cr,SExp* cd)
     isAtom_ = false;
     isString_ = false;
     isCAR_ = false;
+	parent_ = NULL;
 }
 
 void SExp::toString()
